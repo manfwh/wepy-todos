@@ -1,0 +1,57 @@
+<style type="less">
+.todo-header {
+  display: flex;
+  height: 80rpx;
+  justify-content: space-between;
+}
+.input {
+  flex: 1;
+  background: #fff;
+  height: 100%;
+  font-size: 24rpx;
+}
+.addBtn {
+  width: 150rpx;
+  height: 80rpx;
+  background: green;
+  font-size: 24rpx;
+  color: #fff;
+  text-align: center;
+  line-height: 80rpx;
+}
+</style>
+<template>
+  <view class="todo-header">
+    <input class="input" value="{{input}}" @input="update" placeholder="添加一项任务"></input>
+    <view @tap="add" class="addBtn" hidden="{{input == ''}}">添加</view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+
+export default class Group extends wepy.component {
+  props = {
+    // input: {
+    //   type: String,
+    //   twoWay: true
+    // }
+  };
+  data = {
+    input: ''
+  };
+  components = {};
+  methods = {
+    add() {
+      let newTodo = {
+        selected: false,
+        content: this.input
+      };
+      this.$emit('create', newTodo);
+      this.input = '';
+    },
+    update(e) {
+      this.input = e.detail.value;
+    }
+  };
+}
+</script>

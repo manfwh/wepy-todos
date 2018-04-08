@@ -1,0 +1,15 @@
+{
+	"description": "A WePY todoList",
+	"setting": {
+		"urlCheck": true,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx42440125bfabc34f",
+	"projectname": "%E4%BE%BF%E7%AD%BE%E5%8A%A9%E6%89%8B",
+	"miniprogramRoot": "./dist",
+	"condition": {}
+}

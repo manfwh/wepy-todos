@@ -1,0 +1,142 @@
+<style lang="less">
+.todos {
+  width: 100%;
+  padding-bottom: 90rpx;
+  .todo-header {
+    display: flex;
+    height: 80rpx;
+    justify-content: space-between;
+    border-top: 1px solid #ccc;
+  }
+  .input {
+    flex: 1;
+    background: #fff;
+    height: 100%;
+    padding-left: 10rpx;
+  }
+  .addBtn {
+    width: 150rpx;
+    height: 80rpx;
+    background: green;
+    font-size: 24rpx;
+    color: #fff;
+    text-align: center;
+    line-height: 80rpx;
+  }
+  .todos-footer {
+    padding: 0 20px;
+    box-sizing: border-box;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    bottom: 0;
+    left: 0;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    height: 90rpx;
+    line-height: 90rpx;
+    font-size: 28rpx;
+    z-index: 10;
+    border-top: 1px solid #ccc;
+    .clear {
+      color: green;
+    }
+  }
+}
+</style>
+<template>
+  <view class="container">
+    <view class="todos">
+      <todoinput></todoinput>
+      <repeat for="{{todos}}" key="index" index="index" item="item">
+        <todoitem :todo="item"></todoitem>
+      </repeat>
+      <view class="todos-footer">
+        
+        <view>{{remaining}}/{{todos.length}}</view>
+        <view class="clear" @tap="clear">清除已完成</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+// import Toast from 'wepy-com-toast';
+import TodoInput from '@/components/todoinput';
+import TodoItem from '@/components/todoitem';
+
+const STORAGE_KEY = 'todos-wepy';
+const todoStorage = {
+  fetch: function() {
+    let todos = wx.getStorageSync(STORAGE_KEY) || [];
+
+    todos.forEach(function(todo, index) {
+      todo.id = index;
+    });
+    todoStorage.uid = todos.length;
+    return todos;
+  },
+  save: function(todos) {
+    wx.setStorageSync(STORAGE_KEY, todos);
+  }
+};
+const filters = {
+  all: todos => todos,
+  active: todos => todos.filter(todo => !todo.selected),
+  selected: todos => todos.filter(todo => todo.selected)
+};
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '待办事项',
+    onShareAppMessage: function(res) {
+      
+      return {
+        title: '我正在使用今日便签，快来一起使用吧！',
+        path: '/pages/index'
+      };
+    }
+  };
+  components = {
+    todoinput: TodoInput,
+    todoitem: TodoItem
+  };
+
+  data = {
+    todos: todoStorage.fetch()
+  };
+  watch = {
+    todos(todos) {
+      todoStorage.save(todos);
+    }
+  };
+  computed = {
+    remaining: function() {
+      return filters.active(this.todos).length;
+    }
+  };
+
+  methods = {
+    clear() {
+      this.todos = filters.active(this.todos);
+    }
+  };
+
+  events = {
+    create(todo) {
+      this.todos.push({
+        id: todoStorage.uid++,
+        ...todo
+      });
+    },
+
+    delete(todo) {
+      this.todos.splice(this.todos.indexOf(todo), 1);
+    }
+  };
+
+  async onLoad() {}
+}
+</script>
